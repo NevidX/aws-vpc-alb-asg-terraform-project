@@ -22,3 +22,34 @@ output "tf_vpc_id" {
 output "db_subnet_group_name" {
   value = aws_db_subnet_group.tf_db_private_subnet_group.name
 }
+
+# Public Subnet IDs
+output "public_subnet_1_id" {
+  description = "ID of the first public subnet"
+  value       = aws_subnet.tf_subnet_public_1.id
+}
+
+output "public_subnet_2_id" {
+  description = "ID of the second public subnet"
+  value       = aws_subnet.tf_subnet_public_2.id
+}
+
+output "private_subnet_1_id" {
+  description = "ID of the first private subnet"
+  value       = aws_subnet.tf_subnet_private_1.id
+}
+
+output "private_subnet_2_id" {
+  description = "ID of the second private subnet"
+  value       = aws_subnet.tf_subnet_private_2.id
+}
+
+output "alb_security_group_id" {
+  description = "ID of Security Group for ALB"
+  value       = aws_security_group.alb_sg.id
+}
+
+output "ec2_security_group_id" {
+  description = "ID of Security Group for EC2 instances"
+  value       = aws_security_group.ec2_sg.id
+}

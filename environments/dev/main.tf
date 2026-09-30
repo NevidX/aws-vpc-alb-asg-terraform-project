@@ -1,33 +1,46 @@
-module "dev_vpc" {
-  source = "../../modules/vpc" 
 
-  environment        = "dev"
-  vpc_cidr           = "10.1.0.0/16"
-  public_subnet_cidr = "10.1.1.0/24"
-  private_subnet_cidr_1 = "10.1.2.0/24"
-  private_subnet_cidr_2 = "10.1.3.0/24"
 
+# 1. VPC Module (Networking)
+module "vpc" {
+  source = "../../modules/vpc"
+
+  environment           = var.environment
+  vpc_cidr              = var.vpc_cidr
+  public_subnet_cidr_1  = var.public_subnet_cidr_1
+  public_subnet_cidr_2  = var.public_subnet_cidr_2
+  private_subnet_cidr_1 = var.private_subnet_cidr_1
+  private_subnet_cidr_2 = var.private_subnet_cidr_2
+  availability_zone_1   = var.availability_zone_1
+  availability_zone_2   = var.availability_zone_2
 }
 
+# 2. ALB Module (Load Balancing)
+module "alb" {
+  source = "../../modules/alb"
 
-module "web_server" {
-  source = "../../modules/ec2"
-
-  environment       = "dev"
-  subnet_id         = module.dev_vpc.tf_subnet_public_id
-  security_group_id = module.dev_vpc.web_security_group_id
-   
+  environment           = var.environment
+  vpc_id                = module.vpc.vpc_id
+  public_subnet_ids     = [
+    module.vpc.public_subnet_1_id,
+    module.vpc.public_subnet_2_id
+  ]
+  alb_security_group_id = module.vpc.alb_security_group_id
 }
 
-module "rds" {
-  source = "../../modules/rds"
+# 3. ASG Module (Compute & Auto Scaling)
+module "asg" {
+  source = "../../modules/asg"
 
-  environment           = "dev"
-  vpc_id                = module.dev_vpc.tf_vpc_id
-  db_subnet_group_name  = module.dev_vpc.db_subnet_group_name
-  web_security_group_id = module.dev_vpc.web_security_group_id
-
-  db_name     = "devdb"
-  db_username = var.db_username
-  db_password = var.db_password
+  environment           = var.environment
+  ami_id                = var.ami_id
+  instance_type         = var.instance_type
+  ec2_security_group_id = module.vpc.ec2_security_group_id
+  private_subnet_ids    = [
+    module.vpc.private_subnet_1_id,
+    module.vpc.private_subnet_2_id
+  ]
+  target_group_arn      = module.alb.target_group_arn
+  min_size              = var.min_size
+  max_size              = var.max_size
+  desired_capacity      = var.desired_capacity
 }
