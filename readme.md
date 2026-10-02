@@ -50,21 +50,21 @@ graph TD
         subgraph Region ["Region: eu-central-1"]
             subgraph VPC ["VPC: 10.1.0.0/16"]
                 
-                IGW --> NAT[NAT Gateway]
                 IGW --> ALB[Application Load Balancer]
+                NAT -->|Outbound Internet| IGW
                 
                 subgraph Public_Subnets ["Public Subnets"]
                     subgraph Public_Subnet_1 ["Public Subnet 1 - eu-central-1a / 10.1.10.0/24"]
                         ALB
                     end
                     subgraph Public_Subnet_2 ["Public Subnet 2 - eu-central-1b / 10.1.20.0/24"]
-                        NAT
+                        NAT[NAT Gateway]
                     end
                 end
 
                 ALB --> EC2_1
                 ALB --> EC2_2
-                NAT -.->|Outbound| ASG
+                ASG -.->|Outbound Traffic| NAT
 
                 subgraph Private_Subnets ["Private Subnets"]
                     subgraph ASG ["Auto Scaling Group"]
