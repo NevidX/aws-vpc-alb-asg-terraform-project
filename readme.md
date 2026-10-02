@@ -42,7 +42,7 @@ Key Components
     Minimalistic Security Groups (EC2 instances accept inbound traffic exclusively from the ALB Security Group).
 
 
-    ```mermaid
+```mermaid
 graph TD
     Client[Client] --> IGW[Internet Gateway]
     
@@ -54,24 +54,24 @@ graph TD
                 IGW --> ALB[Application Load Balancer]
                 
                 subgraph Public_Subnets ["Public Subnets"]
-                    subgraph Public_Subnet_1 ["Public Subnet (1) - eu-central-1a / 10.1.10.0/24"]
+                    subgraph Public_Subnet_1 ["Public Subnet 1 - eu-central-1a / 10.1.10.0/24"]
                         ALB
                     end
-                    subgraph Public_Subnet_2 ["Public Subnet (2) - eu-central-1b / 10.1.20.0/24"]
+                    subgraph Public_Subnet_2 ["Public Subnet 2 - eu-central-1b / 10.1.20.0/24"]
                         NAT
                     end
                 end
 
                 ALB --> EC2_1
                 ALB --> EC2_2
-                NAT -.->|Outbound Internet| ASG
+                NAT -.->|Outbound| ASG
 
                 subgraph Private_Subnets ["Private Subnets"]
                     subgraph ASG ["Auto Scaling Group"]
-                        subgraph Private_Subnet_1 ["Private Subnet (1) - eu-central-1a / 10.1.30.0/24"]
+                        subgraph Private_Subnet_1 ["Private Subnet 1 - eu-central-1a / 10.1.30.0/24"]
                             EC2_1[EC2 Instance 1]
                         end
-                        subgraph Private_Subnet_2 ["Private Subnet (2) - eu-central-1b / 10.1.40.0/24"]
+                        subgraph Private_Subnet_2 ["Private Subnet 2 - eu-central-1b / 10.1.40.0/24"]
                             EC2_2[EC2 Instance 2]
                         end
                     end
