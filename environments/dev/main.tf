@@ -19,7 +19,7 @@ module "alb" {
   source = "../../modules/alb"
 
   environment           = var.environment
-  vpc_id                = module.vpc.vpc_id
+  vpc_id                = module.vpc.tf_vpc_id
   public_subnet_ids     = [
     module.vpc.public_subnet_1_id,
     module.vpc.public_subnet_2_id
@@ -35,6 +35,7 @@ module "asg" {
   ami_id                = var.ami_id
   instance_type         = var.instance_type
   ec2_security_group_id = module.vpc.ec2_security_group_id
+  ssh_public_key = var.ssh_public_key
   private_subnet_ids    = [
     module.vpc.private_subnet_1_id,
     module.vpc.private_subnet_2_id

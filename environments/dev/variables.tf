@@ -77,7 +77,12 @@ variable "desired_capacity" {
   default     = 2
 }
 
-variable "public_subnet_1_id" {
+variable "ssh_public_key" {
+  description = "Public SSH key for instance access"
+  type        = string
+}
+
+/* variable "public_subnet_1_id" {
   description = "ID of the Security Group for the ALB"
   type        = string
 }
@@ -85,4 +90,4 @@ variable "public_subnet_1_id" {
 variable "public_subnet_2_id" {
   description = "ID of the Security Group for the ALB"
   type        = string
-}
+} */
