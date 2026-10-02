@@ -45,17 +45,17 @@ Key Components
 ```mermaid
 graph TD
     Client[Client] --> IGW[Internet Gateway]
-    
+
     subgraph AWS_Cloud ["AWS Cloud"]
         subgraph Region ["Region: eu-central-1"]
             subgraph VPC ["VPC: 10.1.0.0/16"]
                 
-                IGW --> ALB[Application Load Balancer]
-                NAT -->|Outbound Internet| IGW
+                IGW --> Public_Subnets
                 
                 subgraph Public_Subnets ["Public Subnets"]
+                    direction LR
                     subgraph Public_Subnet_1 ["Public Subnet 1 - eu-central-1a / 10.1.10.0/24"]
-                        ALB
+                        ALB[Application Load Balancer]
                     end
                     subgraph Public_Subnet_2 ["Public Subnet 2 - eu-central-1b / 10.1.20.0/24"]
                         NAT[NAT Gateway]
@@ -64,10 +64,12 @@ graph TD
 
                 ALB --> EC2_1
                 ALB --> EC2_2
-                ASG -.->|Outbound Traffic| NAT
+                
+                NAT -.->|Internet Access| Private_Subnets
 
                 subgraph Private_Subnets ["Private Subnets"]
                     subgraph ASG ["Auto Scaling Group"]
+                        direction LR
                         subgraph Private_Subnet_1 ["Private Subnet 1 - eu-central-1a / 10.1.30.0/24"]
                             EC2_1[EC2 Instance 1]
                         end
