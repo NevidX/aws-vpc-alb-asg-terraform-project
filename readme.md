@@ -1,6 +1,6 @@
 # AWS High-Availability & Auto-Scaling Infrastructure (Terraform)
 
-This project contains a production-ready Terraform configuration designed to deploy a highly available, scalable, and isolated web infrastructure on AWS following the **AWS Well-Architected Framework** best practices.
+This project contains Terraform configuration designed to deploy a highly available, scalable, and isolated web infrastructure on AWS
 
 ---
 
