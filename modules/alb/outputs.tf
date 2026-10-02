@@ -1,14 +1,11 @@
-output "db_endpoint" {
-  value       = aws_db_instance.tf_rds.endpoint
-  description = "RDS connection endpoint"
+# Target Group ARN required for Auto Scaling Group attachment
+output "target_group_arn" {
+  description = "ARN of the ALB Target Group"
+  value       = aws_lb_target_group.tf_tg.arn
 }
 
-output "db_address" {
-  value       = aws_db_instance.tf_rds.address
-  description = "RDS internal hostname"
-}
-
-output "db_port" {
-  value       = aws_db_instance.tf_rds.port
-  description = "RDS port"
+# Public DNS Name of the Load Balancer
+output "alb_dns_name" {
+  description = "DNS name of the Application Load Balancer"
+  value       = aws_lb.tf_alb.dns_name
 }

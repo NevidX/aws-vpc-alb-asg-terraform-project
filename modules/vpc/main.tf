@@ -122,12 +122,12 @@ resource "aws_route_table" "tf_route_table_private" {
 
 # route table associations -----------------------------------
 
-# route table association for public subnet
+# route table association for public subnet 1
 resource "aws_route_table_association" "tf_rta_public_1" {
   subnet_id      = aws_subnet.tf_subnet_public_1.id
   route_table_id = aws_route_table.tf_route_table_public.id
 }
-
+# route table association for public subnet 2
 resource "aws_route_table_association" "tf_rta_public_2" {
   subnet_id      = aws_subnet.tf_subnet_public_2.id
   route_table_id = aws_route_table.tf_route_table_public.id
@@ -190,14 +190,14 @@ resource "aws_security_group" "ec2_sg" {
     security_groups = [aws_security_group.alb_sg.id]
   }
 
-  # SSH for debugging
+/*   # SSH for debugging
   ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+ */
   egress {
     from_port   = 0
     to_port     = 0

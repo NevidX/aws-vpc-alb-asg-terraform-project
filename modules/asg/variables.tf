@@ -46,3 +46,9 @@ variable "desired_capacity" {
   type        = number
   default     = 2
 }
+
+variable "ssh_public_key" {
+  description = "Public SSH key for EC2 instances access"
+  type        = string
+}
+

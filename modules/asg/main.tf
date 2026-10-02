@@ -1,8 +1,20 @@
 # Launch Template for EC2 instances
+resource "aws_key_pair" "tf_key_pair" {
+  key_name   = "${var.environment}-ssh-key"
+  public_key = var.ssh_public_key
+}
+
 resource "aws_launch_template" "tf_launch_template" {
   name_prefix   = "${var.environment}-app-template-"
   image_id      = var.ami_id
   instance_type = var.instance_type
+  key_name      = aws_key_pair.tf_key_pair.key_name
+
+# Linking IAM Profile for SSM to work
+  iam_instance_profile {
+    arn = aws_iam_instance_profile.ec2_ssm_profile.arn
+  }
+
 
   # Keep instances isolated in private subnets
   network_interfaces {
@@ -17,6 +29,8 @@ resource "aws_launch_template" "tf_launch_template" {
               apt-get install -y apache2
               systemctl start apache2
               systemctl enable apache2
+              apt-get update -y
+              apt-get install -y stress
               
               EC2_HOST=$(hostname -f)
               echo "<h1>Hello from High Availability AWS Architecture!</h1><p>Served by Instance: <b>$EC2_HOST</b></p>" > /var/www/html/index.html
@@ -69,5 +83,53 @@ resource "aws_autoscaling_group" "tf_asg" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+#  IAM Role for EC2 instances
+resource "aws_iam_role" "ec2_ssm_role" {
+  name_prefix = "${var.environment}-ec2-ssm-role-"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+
+
+# Attaching a standard AWS managed policy for SSM connection to instaces for debugging
+resource "aws_iam_role_policy_attachment" "ssm_policy" {
+  role       = aws_iam_role.ec2_ssm_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+# Create an Instance Profile that is transferred to EC2
+resource "aws_iam_instance_profile" "ec2_ssm_profile" {
+  name_prefix = "${var.environment}-ec2-ssm-profile-"
+  role        = aws_iam_role.ec2_ssm_role.name
+}
+
+# Policy for autoscaling based on CPU load.
+resource "aws_autoscaling_policy" "cpu_target_tracking" {
+  name                   = "${var.environment}-cpu-target-tracking-policy"
+  autoscaling_group_name = aws_autoscaling_group.tf_asg.name
+  policy_type            = "TargetTrackingScaling"
+
+  target_tracking_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ASGAverageCPUUtilization"
+    }
+
+    # limit of CPU in whole ASG
+    target_value = 50.0
   }
 }
